@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datos en Tiempo Real</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        table {
+            width: 90%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>📡 Datos de GNU Radio en Tiempo Real</h2>
+
+    <table id="data-table">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Latitud</th>
+                <th>Longitud</th>
+                <th>Azimut</th>
+                <th>Elevación</th>
+                <th>Altitud</th>
+                <th>Descripción</th>
+                <th>F.Inicial</th>
+                <th>F.Paso</th>
+                <th>N</th>
+                <th>Datos</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-datos">
+            <tr>
+                <td colspan="11">Esperando datos...</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        async function fetchData() {
+            try {
+                const response = await fetch("http://127.0.0.1:8000/datos");
+                const data = await response.json();
+
+                if (data.error) {
+                    console.error("Error en los datos:", data.error);
+                    return;
+                }
+
+                const tableBody = document.getElementById("tabla-datos");
+
+                // Crear una nueva fila con los datos obtenidos
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${data.Fecha || "N/A"}</td>
+                    <td>${data.Latitud || "N/A"}</td>
+                    <td>${data.Longitud || "N/A"}</td>
+                    <td>${data.Azimut || "N/A"}</td>
+                    <td>${data.Elevacion || "N/A"}</td>
+                    <td>${data.Altitud || "N/A"}</td>
+                    <td>${data.Descripcion || "N/A"}</td>
+                    <td>${data.Finicial || "N/A"}</td>
+                    <td>${data.Fpaso || "N/A"}</td>
+                    <td>${data.N || "N/A"}</td>
+                    <td>${Array.isArray(data.Datos) ? data.Datos.join(", ") : "N/A"}</td>
+                `;
+
+                // Agregar la nueva fila al inicio sin eliminar las anteriores
+                tableBody.prepend(row);
+            } catch (error) {
+                console.error("Error obteniendo los datos:", error);
+            }
+        }
+
+        // Actualizar la tabla cada 2 segundos
+        setInterval(fetchData, 2000);
+    </script>
+
+</body>
+</html>
